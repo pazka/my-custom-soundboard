@@ -5,29 +5,34 @@ import { connect } from 'react-redux';
 import KeyComponent from './Components/Key'
 import SoundPlayer from './Components/Sounds'
 
+import styled from 'styled-components'
+
+const Wrapper = styled.div`
+  display : flex;
+  flex-wrap: wrap;
+  width : 100%;
+
+`
+
 const mapStateToProps = (state) => ({
   ...state
  })
 
 class App extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
   logProps(){
     this.propsLog = JSON.stringify( this.props) 
   }
 
   render(){
     return (
-      <div>
+      <Wrapper>
         {
           this.props.soundReducer.playedKeys.map(key =>(
             <KeyComponent key = {key} keyCode={key}>  </KeyComponent>
           ))
         }
         <SoundPlayer></SoundPlayer>
-      </div>
+      </Wrapper>
     );
   }
 }

@@ -1,4 +1,4 @@
-export default (state = {allSounds:{},playedKeys:[]}, action) => {
+function allSoundReducers (state = {allSounds:{},playedKeys:[]}, action) {
   switch (action.type) {
     case 'ADD_SOUND':
       return reduce_addSound({...state},action)
@@ -12,7 +12,6 @@ export default (state = {allSounds:{},playedKeys:[]}, action) => {
   
 function reduce_addSound (state,action){
 
-  let i = 0
   state.allSounds[action.payload.key] = { players : new Array(5).fill('').map(()=>(new Audio())) , reader : new FileReader()}
 
   //load audioFile in audio player
@@ -37,3 +36,5 @@ function reduce_playSound(state,action){
 
   return state
 }
+
+export default allSoundReducers

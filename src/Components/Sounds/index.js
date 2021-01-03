@@ -1,52 +1,83 @@
-
-
 import React from 'react'
 import { connect } from 'react-redux';
 
 import { playSound } from '../../Actions/soundActions';
 
 const mapStateToProps = (state) => ({
-  ...state.soundReducer
- })
+    ...state.soundReducer
+})
 
- const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = dispatch => ({
     playSound: (keyCode) => dispatch(playSound(keyCode))
- })
+})
 
- class SoundPlayer extends React.Component {
+class SoundPlayer extends React.Component {
 
-    constructor(props) {
-        super(props);
+    componentDidMount() {
+        //prepare the playsound event
+        this.playSoundComponent = this.playSoundComponent.bind(this);
+        this.bindMidiDevices = this.bindMidiDevices.bind(this);
+
+        document.body.addEventListener('keypress', (key)=>{this.playSoundComponent(key.code)});
+
+        //prepare Midi access
+        navigator.requestMIDIAccess()
+            .then(this.onMIDISuccess.bind(this), onMIDIFailure);
+
+        function onMIDIFailure() {
+            alert('Could not access your MIDI devices.');
+        }
     }
-    componentDidMount () {
-        this.playSoundComponent = this.playSoundComponent.bind(this)
-        document.body.addEventListener('keypress', this.playSoundComponent);
+
+    onMIDISuccess(midiAccess) {
+        this.bindMidiDevices(midiAccess)
+
+        midiAccess.onstatechange = ()=>{
+            this.bindMidiDevices(midiAccess)
+        }
+    }
+
+    bindMidiDevices (midiAccess){
+        console.log(midiAccess);
+
+        var inputs = midiAccess.inputs;
+        var outputs = midiAccess.outputs;
+
+        inputs.forEach(device => {
+            console.log('Connecting to device', device);
+            device.onmidimessage = this.playMidiSound.bind(this)
+        })
+    }
+
+    playMidiSound = (m)=>{
+        console.log(m)
+        const [command, key, velocity] = m.data;
+
+        //129 is key down
+        if (command === 144 || command == 137) {
+            this.playSoundComponent(m.currentTarget.name.split(' ')[0] + key)
+        }
     }
 
     keyCodePlayingIndex = {};
 
-    playSoundComponent(key){
-        if(this.props.allSounds.hasOwnProperty(key.code)){
+    playSoundComponent(key) {
+        if (this.props.allSounds.hasOwnProperty(key)) {
 
-            if(!this.keyCodePlayingIndex.hasOwnProperty(key.code))
-                this.keyCodePlayingIndex[key.code] = 0
+            if (!this.keyCodePlayingIndex.hasOwnProperty(key))
+                this.keyCodePlayingIndex[key] = 0
 
-            this.props.allSounds[key.code].players[this.keyCodePlayingIndex[key.code]].play()
+            this.props.allSounds[key].players[this.keyCodePlayingIndex[key]].play()
 
-            this.keyCodePlayingIndex[key.code] = this.keyCodePlayingIndex[key.code] + 1 >= this.props.allSounds[key.code].players.length ? 0 : this.keyCodePlayingIndex[key.code] + 1
-            console.log(this.keyCodePlayingIndex[key.code])
+            this.keyCodePlayingIndex[key] = this.keyCodePlayingIndex[key] + 1 >= this.props.allSounds[key].players.length ? 0 : this.keyCodePlayingIndex[key] + 1
+            console.log(this.keyCodePlayingIndex[key])
         }
 
-        this.props.playSound(key.code);
+        this.props.playSound(key);
     }
 
-    render(){
-        return <div>
-            <h1 >Played : {this.props.playedKey}</h1>
-            {Object.keys(this.keyCodePlayingIndex).map(key =>{
-                return <p>{key} : {this.keyCodePlayingIndex[key]}</p>
-            })}
-        </div>
+    render() {
+        return null
     }
 }
 
