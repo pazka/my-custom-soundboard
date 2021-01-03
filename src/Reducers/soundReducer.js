@@ -1,14 +1,16 @@
-export default (state = {allSounds:{},playedKeys:[]}, action) => {
+export default (state = { allSounds: {}, playedKeys: [] }, action) => {
   switch (action.type) {
     case 'ADD_SOUND':
-      return reduce_addSound({...state},action)
+      return reduce_addSound({ ...state },action);
+
     case 'PLAY_SOUND':
-      return reduce_playSound({...state,playedKeys : [...state.playedKeys]},action)
+      return reduce_playSound({ ...state, playedKeys: [...state.playedKeys] }, action);
     
     default:
     return state
   }
 }
+  
 function reduce_addSound (state, action) {
   const newState = {
     ...state,  // shallow copy existing state
