@@ -6,22 +6,25 @@ import KeyComponent from './Components/Key'
 import SoundPlayer from './Components/Sounds'
 
 const mapStateToProps = (state) => ({
-  ...state.soundReducer
+  ...state
  })
 
 class App extends React.Component {
   constructor(props) {
     super(props);
   }
-  
+
+  logProps(){
+    this.propsLog = JSON.stringify( this.props) 
+  }
+
   render(){
     return (
       <div>
-      {console.log(this.props)}
         {
-          this.props.playedKeys.map(key =>{
-            <KeyComponent keyCode={key}>  </KeyComponent>
-          })
+          this.props.soundReducer.playedKeys.map(key =>(
+            <KeyComponent key = {key} keyCode={key}>  </KeyComponent>
+          ))
         }
         <SoundPlayer></SoundPlayer>
       </div>
