@@ -13,7 +13,7 @@ const Wrapper = styled.div`
 
     &.pressed {
         background-color : blue;
-        transition : all .1s;
+        transition : all .05s;
         color: white;
     }
 

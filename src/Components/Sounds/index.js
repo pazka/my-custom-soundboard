@@ -12,6 +12,13 @@ const mapDispatchToProps = dispatch => ({
 })
 
 class SoundPlayer extends React.Component {
+    displayWarning;
+
+    constructor(props){
+        super(props)
+
+        this.displayWarning = false;
+    }
 
     componentDidMount() {
         //prepare the playsound event
@@ -21,8 +28,12 @@ class SoundPlayer extends React.Component {
         document.body.addEventListener('keypress', (key)=>{this.playSoundComponent(key.code)});
 
         //prepare Midi access
-        navigator.requestMIDIAccess()
-            .then(this.onMIDISuccess.bind(this), onMIDIFailure);
+        if(navigator.requestMIDIAccess){
+            navigator.requestMIDIAccess()
+                .then(this.onMIDISuccess.bind(this), onMIDIFailure);
+        }else{
+            this.displayWarning = true
+        }
 
         function onMIDIFailure() {
             alert('Could not access your MIDI devices.');
@@ -41,7 +52,6 @@ class SoundPlayer extends React.Component {
         console.log(midiAccess);
 
         var inputs = midiAccess.inputs;
-        var outputs = midiAccess.outputs;
 
         inputs.forEach(device => {
             console.log('Connecting to device', device);
@@ -54,7 +64,7 @@ class SoundPlayer extends React.Component {
         const [command, key, velocity] = m.data;
 
         //129 is key down
-        if (command === 144 || command == 137) {
+        if (command === 144 || command === 137) {
             this.playSoundComponent(m.currentTarget.name.split(' ')[0] + key)
         }
     }
@@ -76,8 +86,17 @@ class SoundPlayer extends React.Component {
         this.props.playSound(key);
     }
 
+    warningStyle = {
+        display : "block",
+        position : "absolute",
+        top : "5px",
+        right : "5px",
+        padding : "5px",
+        backgroundColor : "lightcoral"
+    }
+
     render() {
-        return null
+        return !this.displayWarning ? "" : (<p style={this.warningStyle}> You can't use a midi device on a not secure site, please use the <a href={window.location.href.replace('http://','https://')}>secure site (https://)</a> </p>)
     }
 }
 
