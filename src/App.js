@@ -2,41 +2,39 @@ import React from 'react'
 import './App.css';
 import { connect } from 'react-redux';
 
-import { simpleAction } from './Actions/simpleAction';
-
 import KeyComponent from './Components/Key'
 import SoundPlayer from './Components/Sounds'
+
+import styled from 'styled-components'
+
+const Wrapper = styled.div`
+  display : flex;
+  flex-wrap: wrap;
+  width : 100%;
+
+`
 
 const mapStateToProps = (state) => ({
   ...state
  })
 
- const mapDispatchToProps = dispatch => ({
-  simpleAction: () => dispatch(simpleAction())
- })
-
 class App extends React.Component {
-  constructor(props) {
-    super(props);
+  logProps(){
+    this.propsLog = JSON.stringify( this.props) 
   }
-
-  simpleActionEvent = (event) => {
-    this.props.simpleAction();
-  } 
 
   render(){
     return (
-      <div>
-        <KeyComponent keyCode="KeyQ" />
-        <KeyComponent keyCode="KeyW" />
-        <KeyComponent keyCode="KeyE" />
-        <KeyComponent keyCode="KeyR" />
+      <Wrapper>
+        {
+          this.props.soundReducer.playedKeys.map(key =>(
+            <KeyComponent key = {key} keyCode={key}>  </KeyComponent>
+          ))
+        }
         <SoundPlayer></SoundPlayer>
-        <pre>
-        </pre>
-      </div>
+      </Wrapper>
     );
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default connect(mapStateToProps)(App);
